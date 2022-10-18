@@ -1,0 +1,16 @@
+name: Greeting on variable day
+
+on:
+    workflow_dispatch
+
+env:
+    DAY_OF_WEEK: Monday
+
+jobs:
+    greeting_job:
+        runs-on: ubuntu-latest
+        env:
+            Greeting: Hello
+        steps:
+            -   name: "Try the deployment automatic name"
+                run: echo "$Greeting ${{ github.actor }}. You want to deploy <${{github.actor}}-${{github.event.repository.name}}-${{ github.ref_name }}>"
