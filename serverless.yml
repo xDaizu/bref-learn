@@ -1,5 +1,5 @@
-app: aircury
-service: skeleton-api
+app: breaf-learn
+service: symfony-api
 
 provider:
     name: aws
@@ -11,7 +11,7 @@ plugins:
 
 functions:
     api:
-        handler: index.php
+        handler: apps/api/public/index.php
         description: ''
         timeout: 28 # in seconds (API Gateway has a timeout of 29 seconds)
         layers:
