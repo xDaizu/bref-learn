@@ -9,45 +9,55 @@
 # Learn more: https://maxkostinevich.com/blog/how-to-deploy-serverless-applications-using-github-actions/
 #
 
-
 name: Deploy Dev
 
 on:
-    workflow_dispatch:
-    pull_request:
-        branches:
-            - master
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - master
 
 jobs:
-    deploy-dev:
-        runs-on: ubuntu-latest
-        steps:
-            - uses: actions/checkout@v1
-            - uses: actions/setup-node@v1
-              with:
-                  node-version: '14'
-            - name: Install Serverless Framework
-              run: npm install -g serverless
-            - name: Serverless AWS authentication
-              run: sls config credentials --provider aws --key ${{ secrets.AWS_KEY }} --secret ${{ secrets.AWS_SECRET }}
-            - name: Create env file
-              run: | # cp sample.env.yml env.yml
-                  cat > env.yml << EOF
-                  ${{ secrets.ENV }}
-                  EOF
-            - name: Install NPM dependencies
-              run: npm install
-            # Optional
-            #- name: Build assets
-            #  run: npm run assets-dev
-            - name: Deploy Lambda functions
-              run: echo "FOO=$(sls deploy | grep endpoint)" >> $GITHUB_ENV
-        # Optional (to use with serverless-finch serverless plugin)
-        #- name: Deploy assets to S3
-        #  run: sls client deploy --no-delete-contents --no-confirm -s dev
-            - name: Comment PR
-              uses: thollander/actions-comment-pull-request@v1
-              with:
-                  message: |
-                      Build created with output:
-                      ${{ env.FOO }} 
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      BRANCH_NAME: ${{ github.ref_name }}
+      APP_NAME: ${{github.event.repository.name}}
+      OWNER: ${{github.repository_owner}}
+      API_DIR: apps/api
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v1
+      - name: Set up node
+        uses: actions/setup-node@v1
+        with:
+          node-version: '14'
+
+      - name: Setup PHP with composer
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '7.4'
+          tools: composer:v2.2
+
+      - name: Install Serverless Framework
+        run: npm install -g serverless
+
+      - name: Serverless AWS authentication
+        run: sls config credentials --provider aws --key ${{ secrets.AWS_KEY }} --secret ${{ secrets.AWS_SECRET }}
+
+      - name: Install NPM dependencies
+        run: npm install
+
+      - name: Build backend
+        run: |
+          make ci-build
+
+      - name: Deploy Lambda functions
+        run: echo "FOO=$(sls deploy | grep endpoint)" >> $GITHUB_ENV
+
+      - name: Comment PR
+        uses: thollander/actions-comment-pull-request@v1
+        with:
+          message: |
+            Build created with output:
+            ${{ env.FOO }} 

@@ -1,0 +1,80 @@
+app: breaf-learn
+service: symfony-api
+
+provider:
+  name: aws
+  region: eu-west-2
+  runtime: provided.al2
+
+  environment:
+    #postgresql
+    POSTGRESQL_HOST: ${self:custom.POSTGRESQL.HOST}
+    POSTGRESQL_PORT: ${self:custom.POSTGRESQL.PORT}
+    #common
+    DB_NAME: ${self:custom.DB_NAME}
+    USERNAME: ${self:custom.USERNAME}
+    PASSWORD: ${self:custom.PASSWORD}
+    DATABASE_URL: 'postgresql://${env:USERNAME}:${env:PASSWORD}@${cf:pgEndpoint}:5432/${env:DB_NAME}?charset=utf8'
+custom:
+  DB_NAME: breaf-learn-db
+  USERNAME: master
+  PASSWORD: password
+
+plugins:
+  - ./vendor/bref/bref
+  - serverless-pseudo-parameters
+functions:
+  api:
+    handler: apps/api/public/index.php
+    description: ''
+    timeout: 28 # in seconds (API Gateway has a timeout of 29 seconds)
+    layers:
+      - ${bref:layer.php-74-fpm}
+    events:
+      - httpApi: '*'
+
+# For a pgDB inside a VPC look e.g. here:
+# http://www.stojanveselinovski.com/blog/2016/01/12/simple-postgresql-rds-cloudformation-template/
+resources:
+  Resources:
+    pgSecurityGroup:
+      Type: AWS::EC2::SecurityGroup
+      Properties:
+        GroupDescription: Access to Postgres
+        SecurityGroupIngress:
+          - IpProtocol: tcp
+            FromPort: '5432'
+            ToPort: '5432'
+            CidrIp: 0.0.0.0/0
+
+    pgDB:
+      Type: "AWS::RDS::DBInstance"
+      Properties:
+        DBName: ${env:DB_NAME}
+        AllocatedStorage: 5
+        DBInstanceClass: "db.t2.micro"
+        Engine: "postgres"
+        EngineVersion: "9.5.4"
+        MasterUsername: "example"
+        MasterUserPassword: "serverless"
+        VPCSecurityGroups:
+          - Fn::GetAtt:
+              - pgSecurityGroup
+              - GroupId
+        Tags:
+          -
+            Key: "Name"
+            Value: "forum_example"
+      DeletionPolicy: "Snapshot"
+  Outputs:
+    pgEndpoint:
+      Description: "JDBC connection string for database"
+      Value:
+        Fn::GetAtt:
+          - pgDB
+          - Endpoint.Address
+# Exclude files from deployment
+package:
+  patterns:
+    - '!node_modules/**'
+    - '!tests/**'
