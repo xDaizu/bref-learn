@@ -1,8 +1,9 @@
-service: app
+app: aircury
+service: skeleton-api
 
 provider:
     name: aws
-    region: us-west-2
+    region: eu-west-2
     runtime: provided.al2
 
 plugins:
