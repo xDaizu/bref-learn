@@ -53,7 +53,7 @@ jobs:
           make ci-build
 
       - name: Deploy Lambda functions
-        run: echo "FOO=$(sls deploy | grep endpoint)" >> $GITHUB_ENV
+        run: sls deploy
 
       - name: Comment PR
         uses: thollander/actions-comment-pull-request@v1
