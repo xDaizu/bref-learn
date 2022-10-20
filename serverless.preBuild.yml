@@ -10,7 +10,7 @@ provider:
 
 plugins:
   - ./vendor/bref/bref
-  - serverless-pseudo-parameters
+
 functions:
   api:
     handler: apps/api/public/index.php
