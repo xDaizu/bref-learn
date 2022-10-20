@@ -51,7 +51,7 @@ jobs:
 
       - name: Pre build backend deploy
         run: |
-          sls deploy --config serverless.preBuild.yaml --verbose
+          sls deploy --config serverless.preBuild.yml --verbose
 
       - name: Install NPM dependencies
         run: npm install
