@@ -26,7 +26,7 @@ jobs:
       OWNER: ${{github.repository_owner}}
       API_DIR: apps/api
 
-      DB_NAME: breaf-learn-db
+      DB_NAME: breaflearn
       USERNAME: master
       PASSWORD: password
     steps:
