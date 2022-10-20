@@ -25,6 +25,10 @@ jobs:
       APP_NAME: ${{github.event.repository.name}}
       OWNER: ${{github.repository_owner}}
       API_DIR: apps/api
+
+      DB_NAME: breaf-learn-db
+      USERNAME: master
+      PASSWORD: password
     steps:
       - name: Check out repository
         uses: actions/checkout@v1
@@ -44,6 +48,10 @@ jobs:
 
       - name: Serverless AWS authentication
         run: sls config credentials --provider aws --key ${{ secrets.AWS_KEY }} --secret ${{ secrets.AWS_SECRET }}
+
+      - name: Pre build backend deploy
+        run: |
+          sls deploy --config serverless.preBuild.yaml --verbose
 
       - name: Install NPM dependencies
         run: npm install
