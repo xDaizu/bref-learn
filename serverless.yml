@@ -3,11 +3,13 @@ service: '${env:APP_NAME}-api'
 
 provider:
   name: aws
+  stage: prod
   region: eu-west-2
   runtime: provided.al2
 
   environment:
     DATABASE_URL: 'postgresql://${env:USERNAME}:${env:PASSWORD}@${cf:${env:APP_NAME}-api-preBuild-dev.pgEndpoint}:5432/${env:DB_NAME}?charset=utf8'
+    APP_ENV: prod
 
 plugins:
   - ./vendor/bref/bref
@@ -21,9 +23,25 @@ functions:
       - ${bref:layer.php-74-fpm}
     events:
       - httpApi: '*'
-
+  console:
+    handler: bin/console
+    timeout: 120 # in seconds
+    layers:
+      - ${bref:layer.php-80} # PHP
+      - ${bref:layer.console} # The "console" layer
 # Exclude files from deployment
 package:
   patterns:
     - '!node_modules/**'
     - '!tests/**'
+      # Excluded files and folders for API
+    - '!apps/api/assets/**'
+    - '!apps/api/node_modules/**'
+    - '!apps/api/public/build/**'
+    - '!apps/api/tests/**'
+    - '!apps/api/var/**'
+    # If you want to include files and folders that are part of excluded folders,
+    # add them at the end
+    - 'apps/api/var/cache/prod/**'
+    - 'apps/api/public/build/entrypoints.json'
+    - 'apps/api/public/build/manifest.json'
