@@ -9,7 +9,7 @@ provider:
 
   environment:
     DATABASE_URL: 'postgresql://${env:USERNAME}:${env:PASSWORD}@${cf:${env:APP_NAME}-api-preBuild-dev.pgEndpoint}:5432/${env:DB_NAME}?charset=utf8'
-    APP_ENV: prod
+    APP_ENV: dev
 
 plugins:
   - ./vendor/bref/bref
