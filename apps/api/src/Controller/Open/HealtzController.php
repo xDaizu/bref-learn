@@ -1,8 +1,7 @@
 <?php declare(strict_types=1);
 
-namespace App\Api\Controller\Open;
+namespace App\Controller\Open;
 
-use Swagger\Annotations as SWG;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
