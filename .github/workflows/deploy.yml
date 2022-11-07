@@ -56,9 +56,7 @@ jobs:
       - name: Get outputs from the stack just created
         id: get-outputs
         run: >-
-          echo "::set-output name=DBENDPOINT::$(
-            aws cloudformation list-exports
-          )"
+          echo "DBENDPOINT=$(echo "Potato")" >> $GITHUB_OUTPUT
 
       - name: Install NPM dependencies
         run: npm install
@@ -77,4 +75,4 @@ jobs:
             Build created with output:
             ${{ env.FOO }} 
             pgEndpoint: 
-            ${{ steps.get-outputs.outputs.DBENDPOINT }}
+            ${{ output.DBENDPOINT }}
