@@ -57,7 +57,7 @@ jobs:
         id: get-outputs
         run: >-
           echo "::set-output name=DBENDPOINT::$(
-          echo "Potato"
+            aws cloudformation list-exports
           )"
 
       - name: Install NPM dependencies
