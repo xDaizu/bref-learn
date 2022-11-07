@@ -49,9 +49,19 @@ jobs:
       - name: Serverless AWS authentication
         run: sls config credentials --provider aws --key ${{ secrets.AWS_KEY }} --secret ${{ secrets.AWS_SECRET }}
 
-      - name: Pre build backend deploy
+      - name: Build Backend Infrastructure
         run: |
           sls deploy --config serverless.preBuild.yml --verbose
+
+      - name: Get outputs from the stack just created
+        id: get-outputs
+        run: >-
+          echo "::set-output name=DBENDPOINT::$(
+            aws cloudformation \
+            --region us-west-2 describe-stacks \
+            --stack-name $(echo ${GITHUB_REF##*/}) \
+            --query "Stacks[0].Outputs[0].OutputValue"
+          )"
 
       - name: Install NPM dependencies
         run: npm install
@@ -61,7 +71,7 @@ jobs:
           make ci-build
 
       - name: Deploy Lambda functions
-        run: sls deploy
+        run: echo "FOO=$(sls deploy | grep endpoint)" >> $GITHUB_ENV
 
       - name: Comment PR
         uses: thollander/actions-comment-pull-request@v1
@@ -70,4 +80,4 @@ jobs:
             Build created with output:
             ${{ env.FOO }} 
             pgEndpoint: 
-            ${{ env.DATABASE_URL }}
+            ${{ steps.get-outputs.outputs.DBENDPOINT }}
