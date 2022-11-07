@@ -57,10 +57,7 @@ jobs:
         id: get-outputs
         run: >-
           echo "::set-output name=DBENDPOINT::$(
-            aws cloudformation \
-            --region us-west-2 describe-stacks \
-            --stack-name $(echo ${GITHUB_REF##*/}) \
-            --query "Stacks[0].Outputs[0].OutputValue"
+          echo "Potato"
           )"
 
       - name: Install NPM dependencies
