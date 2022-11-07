@@ -69,3 +69,5 @@ jobs:
           message: |
             Build created with output:
             ${{ env.FOO }} 
+            pgEndpoint: 
+            ${{ env.DATABASE_URL }}

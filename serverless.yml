@@ -45,3 +45,8 @@ package:
     - 'apps/api/var/cache/prod/**'
     - 'apps/api/public/build/entrypoints.json'
     - 'apps/api/public/build/manifest.json'
+
+custom:
+  scripts:
+    hooks:
+      'deploy:finalize': ./post-deploy ${self:provider.stage}

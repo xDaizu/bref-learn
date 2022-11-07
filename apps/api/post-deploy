@@ -1,0 +1,6 @@
+#!/bin/bash -xve
+
+ export AWS_CLIENT_TIMEOUT=300000
+
+sls invoke -f console -s $1 -d '{"cli": "doctrine:database:create  --if-not-exists"}'
+sls invoke -f console -s $1 -d '{"cli": "doctrine:migrations:migrate --no-interaction"}'
