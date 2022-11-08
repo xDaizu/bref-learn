@@ -25,7 +25,7 @@ functions:
     events:
       - httpApi: '*'
   console:
-    handler: bin/console
+    handler: apps/api/bin/console
     timeout: 120 # in seconds
     layers:
       - ${bref:layer.php-80} # PHP
