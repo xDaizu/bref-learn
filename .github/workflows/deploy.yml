@@ -83,4 +83,4 @@ jobs:
             Build created with output:
             ${{ env.FOO }} 
             pgEndpoint: 
-            ${{ output.DBENDPOINT }}
+            ${{ steps.get-db-output.outputs.DBENDPOINT }}
