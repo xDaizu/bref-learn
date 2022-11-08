@@ -62,7 +62,6 @@ jobs:
           echo "DBENDPOINT=$(
                 aws cloudformation describe-stacks \
                 --stack-name bref-learn-api-preBuild-dev \
-                --profile=personal-profile \
                 --region=eu-west-2 --query "Stacks[0].Outputs[0].OutputValue"
           )" >> $GITHUB_OUTPUT
 
