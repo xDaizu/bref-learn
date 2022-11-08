@@ -10,7 +10,7 @@ provider:
   environment:
     DATABASE_URL: 'postgresql://${env:USERNAME}:${env:PASSWORD}@${cf:skeleton-db-build-dev.pgEndpoint}:5432/${env:DB_NAME}?charset=utf8'
     APP_ENV: '${env:APP_ENV}'
-
+    PHP_INI_SCAN_DIR: /var/task/infrastructure/php/conf.d
 plugins:
   - ./vendor/bref/bref
   - serverless-plugin-scripts
