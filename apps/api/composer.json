@@ -4,7 +4,7 @@
     "minimum-stability": "stable",
     "prefer-stable": true,
     "require": {
-        "php": "^8.0",
+        "php": ">=7.2.5",
         "ext-ctype": "*",
         "ext-iconv": "*",
         "ext-pdo": "*",
@@ -48,9 +48,6 @@
         "twig/twig": "^2.12|^3.0"
     },
     "config": {
-        "platform": {
-            "php": "8.0"
-        },
         "allow-plugins": {
             "composer/package-versions-deprecated": true,
             "symfony/flex": true,
