@@ -10,14 +10,6 @@ provider:
 
 plugins:
   - ./vendor/bref/bref
-  - serverless-export-outputs
-
-custom:
-  exportOutputs:
-    handler: infrastructure/env.js # script to process outputs
-    output:
-      file: ./.env # file path and name relative to root
-      format: yaml # toml, yaml/yml, json
 
 functions:
   api:
