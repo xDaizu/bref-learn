@@ -75,6 +75,14 @@ jobs:
       - name: Deploy Lambda functions
         run: echo "FOO=$(sls deploy | grep endpoint)" >> $GITHUB_ENV
 
+      - name: Create database
+        run: |
+          sls invoke -f console -s dev -d '{"cli": "doctrine:database:create  --if-not-exists"}'
+
+      - name: Migrations
+        run: |
+          sls invoke -f console -s dev -d '{"cli": "doctrine:migrations:migrate --no-interaction"}'
+
       - name: Comment PR
         uses: thollander/actions-comment-pull-request@v1
         with:

@@ -50,4 +50,4 @@ package:
 custom:
   scripts:
     hooks:
-      'deploy:finalize': ./apps/api/post-deploy ${self:provider.stage} #db create and migrations
+#      'deploy:finalize': ./apps/api/post-deploy ${self:provider.stage} #db create and migrations
