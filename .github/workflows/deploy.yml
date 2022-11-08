@@ -56,8 +56,8 @@ jobs:
         run: |
           sls deploy --config serverless.preBuild.yml --verbose
 
-      - name: Get outputs from the stack just created
-        id: get-outputs
+      - name: Get db outputs from the stack just created
+        id: get-db-output
         run: >-
           echo "DBENDPOINT=$(
                 aws cloudformation describe-stacks \
