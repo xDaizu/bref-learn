@@ -54,7 +54,7 @@ jobs:
           sls deploy --config serverless.preBuild.yml --verbose
 
       - name: Get outputs from the stack just created
-        id: get-outputs
+        id: get-db-output
         run: >-
           echo "DBENDPOINT=$(echo "Potato")" >> $GITHUB_OUTPUT
 
@@ -75,4 +75,4 @@ jobs:
             Build created with output:
             ${{ env.FOO }} 
             pgEndpoint: 
-            ${{ output.DBENDPOINT }}
+            ${{ steps.get-db-output.outputs.DBENDPOINT }}
