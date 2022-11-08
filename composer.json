@@ -1,6 +1,7 @@
 {
     "require": {
         "bref/bref": "^1.7",
-        "ext-pdo": "*"
+        "ext-pdo": "*",
+        "ext-pdo_pgsql": "*"
     }
 }
