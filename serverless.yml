@@ -3,13 +3,13 @@ service: '${env:APP_NAME}-api'
 
 provider:
   name: aws
-  stage: prod
+  stage: '${env:APP_ENV}'
   region: eu-west-2
   runtime: provided.al2
 
   environment:
     DATABASE_URL: 'postgresql://${env:USERNAME}:${env:PASSWORD}@${cf:skeleton-db-build-dev.pgEndpoint}:5432/${env:DB_NAME}?charset=utf8'
-    APP_ENV: dev
+    APP_ENV: '${env:APP_ENV}'
 
 plugins:
   - ./vendor/bref/bref

@@ -25,6 +25,7 @@ jobs:
       APP_NAME: ${{github.event.repository.name}}
       OWNER: ${{github.repository_owner}}
       API_DIR: apps/api
+      APP_ENV: dev
 
       DB_NAME: breaflearn2
       USERNAME: master
