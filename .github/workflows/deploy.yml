@@ -54,14 +54,14 @@ jobs:
 
       - name: Build Backend Infrastructure
         run: |
-          sls deploy --config serverless.preBuild.yml --verbose
+          sls deploy --config serverless.dbBuild.yml --verbose
 
       - name: Get db outputs from the stack just created
         id: get-db-output
         run: >-
           echo "DBENDPOINT=$(
                 aws cloudformation describe-stacks \
-                --stack-name bref-learn-api-preBuild-dev \
+                --stack-name skeleton-db-build-dev \
                 --region=eu-west-2 --query "Stacks[0].Outputs[0].OutputValue"
           )" >> $GITHUB_OUTPUT
 

@@ -1,5 +1,5 @@
-app: '${env:APP_NAME}'
-service: '${env:APP_NAME}-api-preBuild'
+app: skeleton
+service: skeleton-db-build
 useDotenv: true
 
 provider:
@@ -10,16 +10,6 @@ provider:
 
 plugins:
   - ./vendor/bref/bref
-
-functions:
-  api:
-    handler: apps/api/public/index.php
-    description: ''
-    timeout: 28 # in seconds (API Gateway has a timeout of 29 seconds)
-    layers:
-      - ${bref:layer.php-74-fpm}
-    events:
-      - httpApi: '*'
 
 # For a pgDB inside a VPC look e.g. here:
 # http://www.stojanveselinovski.com/blog/2016/01/12/simple-postgresql-rds-cloudformation-template/
