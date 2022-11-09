@@ -22,10 +22,12 @@ jobs:
     runs-on: ubuntu-latest
     env:
       BRANCH_NAME: ${{ github.ref_name }}
-      APP_NAME: ${{github.event.repository.name}}
       OWNER: ${{github.repository_owner}}
-      API_DIR: apps/api
+      APP_NAME: ${{github.event.repository.name}}
       APP_ENV: dev
+      API_DIR: apps/api
+      FRONTEND_DIR: apps/frontend
+      FRONTEND_S3_BUCKET: ${env:APP_NAME}-${env:APP_ENV}
 
       DB_NAME: breaflearn2
       USERNAME: example
@@ -69,9 +71,22 @@ jobs:
       - name: Install NPM dependencies
         run: npm install
 
+      - name: Build frontend
+        run: |
+          make ci-build-front
+
+      - name: Upload S3
+        uses: shallwefootball/s3-upload-action@master
+        id: S3
+        with:
+          aws_key_id: ${{secrets.AWS_KEY}}
+          aws_secret_access_key: ${{secrets.AWS_SECRET}}
+          aws_bucket: ${env:FRONTEND_S3_BUCKET}
+          source_dir: apps/frontend/public
+
       - name: Build backend
         run: |
-          make ci-build
+          make ci-build-back
 
       - name: Deploy Lambda functions
         run: echo "FOO=$(sls deploy | grep endpoint)" >> $GITHUB_ENV
