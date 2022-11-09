@@ -15,7 +15,7 @@ Resources:
       OwnershipControls:
         Rules:
           - ObjectOwnership: BucketOwnerEnforced # Avoid old AWS account ownership after s3 sync
-      BucketName: ${env:APP_NAME}-${env:APP_ENV}
+      BucketName: ${env:FRONTEND_S3_BUCKET}
       # AccessControl: PublicRead
   UploadBucketAllowPublicReadPolicy:
     Type: AWS::S3::BucketPolicy
@@ -32,5 +32,5 @@ Resources:
               - s3:PutObjectAcl
               #
             Resource:
-              - arn:aws:s3:::${env:APP_NAME}-${env:APP_ENV}/*
+              - arn:aws:s3:::${env:FRONTEND_S3_BUCKET}/*
             Principal: "*"
