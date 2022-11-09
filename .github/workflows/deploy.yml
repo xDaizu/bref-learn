@@ -68,8 +68,11 @@ jobs:
                 --region=eu-west-2 --query "Stacks[0].Outputs[0].OutputValue"
           )" >> $GITHUB_OUTPUT
 
-      - name: Install NPM dependencies
-        run: npm install
+
+      - name: Build S3 bucket for frontend
+        run: |
+          sls deploy --config serverless.s3.yml --verbose
+
 
       - name: Build frontend
         run: |
