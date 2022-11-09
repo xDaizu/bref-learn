@@ -1,3 +1,13 @@
+app: skeleton
+service: skeleton-s3-build
+useDotenv: true
+
+provider:
+  name: aws
+  stage: ${env:APP_ENV}
+  region: eu-west-2
+  runtime: provided.al2
+
 Resources:
   UploadBucket:
     Type: AWS::S3::Bucket

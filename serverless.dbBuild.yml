@@ -4,7 +4,7 @@ useDotenv: true
 
 provider:
   name: aws
-  stage: dev
+  stage: ${env:APP_ENV}
   region: eu-west-2
   runtime: provided.al2
 
