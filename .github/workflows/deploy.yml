@@ -73,6 +73,14 @@ jobs:
         run: |
           sls deploy --config serverless.s3.yml --verbose
 
+      - name: Get s3 outputs from the stack just created
+        id: get-s3-output
+        run: >-
+          echo "S3BUCKETNAME=$(
+                aws cloudformation describe-stacks \
+                --stack-name skeleton-s3-build-dev \
+                --region=eu-west-2 --query "Stacks[0].Outputs[0].OutputValue"
+          )" >> $GITHUB_OUTPUT
 
       - name: Build frontend
         run: |
@@ -84,7 +92,7 @@ jobs:
         with:
           aws_key_id: ${{secrets.AWS_KEY}}
           aws_secret_access_key: ${{secrets.AWS_SECRET}}
-          aws_bucket: ${env:FRONTEND_S3_BUCKET}
+          aws_bucket: ${{ steps.get-s3-output.outputs.S3BUCKETNAME }}
           source_dir: apps/frontend/public
 
       - name: Build backend
