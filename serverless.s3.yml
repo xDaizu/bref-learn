@@ -8,29 +8,30 @@ provider:
   region: eu-west-2
   runtime: provided.al2
 
-Resources:
-  UploadBucket:
-    Type: AWS::S3::Bucket
-    Properties:
-      OwnershipControls:
-        Rules:
-          - ObjectOwnership: BucketOwnerEnforced # Avoid old AWS account ownership after s3 sync
-      BucketName: potato
-      # AccessControl: PublicRead
-  UploadBucketAllowPublicReadPolicy:
-    Type: AWS::S3::BucketPolicy
-    Properties:
-      Bucket: !Ref UploadBucket
-      PolicyDocument:
-        Version: "2012-10-17"
-        Statement:
-          - Effect: Allow
-            Action:
-              - s3:GetObject
-              # Only needed when syncing contents from old S3
-              - s3:PutObject
-              - s3:PutObjectAcl
-              #
-            Resource:
-              - arn:aws:s3:::potato/*
-            Principal: "*"
+resources:
+  Resources:
+    UploadBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        OwnershipControls:
+          Rules:
+            - ObjectOwnership: BucketOwnerEnforced # Avoid old AWS account ownership after s3 sync
+        BucketName: potato
+        # AccessControl: PublicRead
+    UploadBucketAllowPublicReadPolicy:
+      Type: AWS::S3::BucketPolicy
+      Properties:
+        Bucket: !Ref UploadBucket
+        PolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action:
+                - s3:GetObject
+                # Only needed when syncing contents from old S3
+                - s3:PutObject
+                - s3:PutObjectAcl
+                #
+              Resource:
+                - arn:aws:s3:::potato/*
+              Principal: "*"
