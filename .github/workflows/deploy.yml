@@ -79,13 +79,20 @@ jobs:
           make ci-build-front
 
       - name: Upload S3
-        uses: shallwefootball/s3-upload-action@master
-        id: S3
+        uses: reggionick/s3-deploy@v3
         with:
-          aws_key_id: ${{secrets.AWS_KEY}}
-          aws_secret_access_key: ${{secrets.AWS_SECRET}}
-          aws_bucket: ${{ env.FRONTEND_S3_BUCKET }}
-          source_dir: apps/frontend/public
+          folder: apps/frontend/public
+          bucket: ${{ env.FRONTEND_S3_BUCKET }}
+          bucket-region: eu-west-2
+
+#      - name: Upload S3
+#        uses: shallwefootball/s3-upload-action@master
+#        id: S3
+#        with:
+#          aws_key_id: ${{secrets.AWS_KEY}}
+#          aws_secret_access_key: ${{secrets.AWS_SECRET}}
+#          aws_bucket: ${{ env.FRONTEND_S3_BUCKET }}
+#          source_dir: apps/frontend/public
 
       - name: Build backend
         run: |
