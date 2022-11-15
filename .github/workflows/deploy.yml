@@ -65,7 +65,8 @@ jobs:
           make ci-build-front
 
       - name: Upload S3
-        run: aws s3 sync apps/frontend/public/ s3://${{ FRONTEND_S3_BUCKET }}/ --delete
+        run: |
+          aws s3 sync apps/frontend/public/ s3://${{ env.FRONTEND_S3_BUCKET }}/ --delete
 
       - name: Build Backend Infrastructure
         run: |
