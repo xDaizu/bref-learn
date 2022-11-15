@@ -21,6 +21,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     env:
+      AWS_DEFAULT_REGION: eu-west-2
       BRANCH_NAME: ${{ github.ref_name }}
       OWNER: ${{github.repository_owner}}
       APP_NAME: ${{github.event.repository.name}}
@@ -66,7 +67,7 @@ jobs:
 
       - name: Upload S3
         run: |
-          aws s3 sync apps/frontend/public/ s3://${{ env.FRONTEND_S3_BUCKET }} --delete
+          aws s3 sync apps/frontend/public/ s3://${{ env.FRONTEND_S3_BUCKET }}/ --delete
 
       - name: Build Backend Infrastructure
         run: |
