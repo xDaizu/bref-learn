@@ -1,5 +1,5 @@
 app: skeleton
-service: skeleton-s3-build
+service: ${env:APP_NAME}-s3
 useDotenv: true
 
 provider:
@@ -10,7 +10,7 @@ provider:
 
 resources:
   Resources:
-    UploadBucket:
+    FrontendBucket:
       Type: AWS::S3::Bucket
       Properties:
         OwnershipControls:
@@ -18,10 +18,10 @@ resources:
             - ObjectOwnership: BucketOwnerEnforced # Avoid old AWS account ownership after s3 sync
         BucketName: ${env:FRONTEND_S3_BUCKET}
         # AccessControl: PublicRead
-    UploadBucketAllowPublicReadPolicy:
+    FrontendBucketAllowPublicReadPolicy:
       Type: AWS::S3::BucketPolicy
       Properties:
-        Bucket: !Ref UploadBucket
+        Bucket: !Ref FrontendBucket
         PolicyDocument:
           Version: "2012-10-17"
           Statement:
@@ -32,5 +32,8 @@ resources:
 #                - s3:PutObject
 #                - s3:PutObjectAcl
                 #
-              Resource: !Join ['/', [!GetAtt UploadBucket.Arn, '*']]
+              Resource: !Join ['/', [!GetAtt FrontendBucket.Arn, '*']]
               Principal: "*"
+  Outputs:
+    FrontendBucketDomain:
+      Value: !GetAtt FrontendBucket.DomainName
