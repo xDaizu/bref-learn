@@ -28,7 +28,7 @@ jobs:
       API_DIR: apps/api
       FRONTEND_DIR: apps/frontend
       #      FRONTEND_S3_BUCKET: frontend-${{env.APP_NAME}}-${{env.APP_ENV}}
-      FRONTEND_S3_BUCKET: frontend-${{github.repository_owner}}-${{github.event.repository.name}}-dev-aircury-1234
+      FRONTEND_S3_BUCKET: frontend-${{github.event.repository.name}}-dev-aircury-1234
 
       DB_NAME: breaflearn2
       USERNAME: example
@@ -56,6 +56,17 @@ jobs:
       - name: Serverless AWS authentication
         run: sls config credentials --provider aws --key ${{ secrets.AWS_KEY }} --secret ${{ secrets.AWS_SECRET }}
 
+      - name: Build S3 bucket for frontend
+        run: |
+          sls deploy --config serverless.s3.yml --verbose
+
+      - name: Build frontend
+        run: |
+          make ci-build-front
+
+      - name: Upload S3
+        run: aws s3 sync apps/frontend/public/ s3://${{ FRONTEND_S3_BUCKET }}/ --delete
+
       - name: Build Backend Infrastructure
         run: |
           sls deploy --config serverless.dbBuild.yml --verbose
@@ -70,20 +81,6 @@ jobs:
           )" >> $GITHUB_OUTPUT
 
 
-      - name: Build S3 bucket for frontend
-        run: |
-          sls deploy --config serverless.s3.yml --verbose
-
-      - name: Build frontend
-        run: |
-          make ci-build-front
-
-      - name: Upload S3
-        uses: reggionick/s3-deploy@v3
-        with:
-          folder: apps/frontend/public
-          bucket: ${{ env.FRONTEND_S3_BUCKET }}
-          bucket-region: eu-west-2
 
 #      - name: Upload S3
 #        uses: shallwefootball/s3-upload-action@master
