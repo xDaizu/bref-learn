@@ -29,7 +29,7 @@ jobs:
       API_DIR: apps/api
       FRONTEND_DIR: apps/frontend
       #      FRONTEND_S3_BUCKET: frontend-${{env.APP_NAME}}-${{env.APP_ENV}}
-      FRONTEND_S3_BUCKET: frontend-${{github.event.repository.name}}-dev-aircury-1234
+      FRONTEND_S3_BUCKET: frontend-${{github.event.repository.name}}-dev-aircury-2345
 
       DB_NAME: breaflearn2
       USERNAME: example
