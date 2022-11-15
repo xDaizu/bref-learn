@@ -19,11 +19,10 @@ functions:
   api:
     handler: apps/api/public/index.php
     description: ''
-    timeout: 28 # in seconds (API Gateway has a timeout of 29 seconds)
+    timeout: 160 # in seconds (Cloudfront has a timeout of 180 seconds)
     layers:
       - ${bref:layer.php-74-fpm}
-    events:
-      - httpApi: '*'
+    url: true
   console:
     handler: apps/api/bin/console
     timeout: 120 # in seconds
