@@ -29,9 +29,8 @@ resources:
               Action:
                 - s3:GetObject
                 # Only needed when syncing contents from old S3
-                - s3:PutObject
-                - s3:PutObjectAcl
+#                - s3:PutObject
+#                - s3:PutObjectAcl
                 #
-              Resource:
-                - arn:aws:s3:::${env:FRONTEND_S3_BUCKET}/*
+              Resource: !Join ['/', [!GetAtt UploadBucket.Arn, '*']]
               Principal: "*"
