@@ -1,0 +1,39 @@
+app: skeleton
+service: ${env:APP_NAME}-s3
+useDotenv: true
+
+provider:
+  name: aws
+  stage: ${env:APP_ENV}
+  region: eu-west-2
+  runtime: provided.al2
+
+resources:
+  Resources:
+    FrontendBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        OwnershipControls:
+          Rules:
+            - ObjectOwnership: BucketOwnerEnforced # Avoid old AWS account ownership after s3 sync
+        BucketName: ${env:FRONTEND_S3_BUCKET}
+        # AccessControl: PublicRead
+    FrontendBucketAllowPublicReadPolicy:
+      Type: AWS::S3::BucketPolicy
+      Properties:
+        Bucket: !Ref FrontendBucket
+        PolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action:
+                - s3:GetObject
+                # Only needed when syncing contents from old S3
+#                - s3:PutObject
+#                - s3:PutObjectAcl
+                #
+              Resource: !Join ['/', [!GetAtt FrontendBucket.Arn, '*']]
+              Principal: "*"
+  Outputs:
+    FrontendBucketDomain:
+      Value: !GetAtt FrontendBucket.DomainName

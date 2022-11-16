@@ -1,7 +1,7 @@
 #
 # Github Actions for Serverless Framework
 #
-# Create AWS_KEY and AWS_SECRET secrets in Github repository settings
+# Create AWS_KEY and AWS_SECRET secrets in GitHub repository settings
 # If you're using env.yml file, store its content as ENV Github secret
 #
 # Master branch will be deployed as DEV and every new tag starting with "v**" (e.g. v1.0, v1.2, v2.0, etc) will be deployed as PROD
@@ -9,40 +9,116 @@
 # Learn more: https://maxkostinevich.com/blog/how-to-deploy-serverless-applications-using-github-actions/
 #
 
-
 name: Deploy Dev
 
 on:
-    workflow_dispatch:
-    pull_request:
-        branches:
-            - master
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - master
 
 jobs:
-    deploy-dev:
-        runs-on: ubuntu-latest
-        steps:
-            - uses: actions/checkout@v1
-            - uses: actions/setup-node@v1
-              with:
-                  node-version: '14'
-            - name: Install Serverless Framework
-              run: npm install -g serverless
-            - name: Serverless AWS authentication
-              run: sls config credentials --provider aws --key ${{ secrets.AWS_KEY }} --secret ${{ secrets.AWS_SECRET }}
-            - name: Create env file
-              run: | # cp sample.env.yml env.yml
-                  cat > env.yml << EOF
-                  ${{ secrets.ENV }}
-                  EOF
-            - name: Install NPM dependencies
-              run: npm install
-            # Optional
-            #- name: Build assets
-            #  run: npm run assets-dev
-            - name: Deploy Lambda functions
-              run: sls deploy
-        # Optional (to use with serverless-finch serverless plugin)
-        #- name: Deploy assets to S3
-        #  run: sls client deploy --no-delete-contents --no-confirm -s dev
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      AWS_DEFAULT_REGION: eu-west-2
+      BRANCH_NAME: ${{ github.ref_name }}
+      OWNER: ${{github.repository_owner}}
+      APP_NAME: ${{github.event.repository.name}}
+      APP_ENV: dev
+      API_DIR: apps/api
+      FRONTEND_DIR: apps/frontend
+      #      FRONTEND_S3_BUCKET: frontend-${{env.APP_NAME}}-${{env.APP_ENV}}
+      FRONTEND_S3_BUCKET: frontend-${{github.event.repository.name}}-dev-aircury-2345
+      DB_NAME: breaflearn2
+      USERNAME: example
+      PASSWORD: serverless
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v1
+      - name: Set up node
+        uses: actions/setup-node@v1
+        with:
+          node-version: '14'
 
+      - name: Setup PHP with composer
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '7.4'
+          tools: composer:v2.2
+
+      - name: Install Serverless Framework
+        run: npm install -g serverless
+
+      - name: Install NPM dependencies
+        run: npm install
+
+      - name: Serverless AWS authentication
+        run: sls config credentials --provider aws --key ${{ secrets.AWS_KEY }} --secret ${{ secrets.AWS_SECRET }}
+
+      - name: Build S3 bucket for frontend
+        run: |
+          sls deploy --config serverless.s3.yml --verbose
+
+      - name: Set frontend url
+        run: |
+          echo "PUBLIC_URL=https://${{ env.FRONTEND_S3_BUCKET }}.s3.eu-west-2.amazonaws.com" >> $GITHUB_ENV
+
+      - name: Build frontend
+        run: |
+          make ci-build-front
+
+      - name: Upload S3
+        run: |
+          aws s3 sync apps/frontend/build/ s3://${{ env.FRONTEND_S3_BUCKET }}/ --delete
+
+      - name: Build Backend Infrastructure
+        run: |
+          sls deploy --config serverless.dbBuild.yml --verbose
+
+      - name: Get db outputs from the stack just created
+        id: get-db-output
+        run: >-
+          echo "DBENDPOINT=$(
+                aws cloudformation describe-stacks \
+                --stack-name skeleton-db-build-dev \
+                --region=eu-west-2 --query "Stacks[0].Outputs[0].OutputValue"
+          )" >> $GITHUB_OUTPUT
+
+
+
+#      - name: Upload S3
+#        uses: shallwefootball/s3-upload-action@master
+#        id: S3
+#        with:
+#          aws_key_id: ${{secrets.AWS_KEY}}
+#          aws_secret_access_key: ${{secrets.AWS_SECRET}}
+#          aws_bucket: ${{ env.FRONTEND_S3_BUCKET }}
+#          source_dir: apps/frontend/public
+
+      - name: Build backend
+        run: |
+          make ci-build-back
+
+      - name: Deploy Lambda functions
+        run: echo "FOO=$(sls deploy | grep endpoint)" >> $GITHUB_ENV
+
+      - name: Create database
+        run: |
+          sls invoke -f console -s dev -d '{"cli": "doctrine:database:create  --if-not-exists"}'
+
+      - name: Migrations
+        run: |
+          sls invoke -f console -s dev -d '{"cli": "doctrine:migrations:migrate --no-interaction"}'
+
+      - name: Comment PR
+        uses: thollander/actions-comment-pull-request@v1
+        with:
+          message: |
+            Build created with endpoints: 
+            API:
+            ${{ env.FOO }} 
+            Frontend: 
+            ${{ env.PUBLIC_URL }}
+            pgEndpoint: 
+            ${{ steps.get-db-output.outputs.DBENDPOINT }}
