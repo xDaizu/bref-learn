@@ -30,7 +30,6 @@ jobs:
       FRONTEND_DIR: apps/frontend
       #      FRONTEND_S3_BUCKET: frontend-${{env.APP_NAME}}-${{env.APP_ENV}}
       FRONTEND_S3_BUCKET: frontend-${{github.event.repository.name}}-dev-aircury-2345
-
       DB_NAME: breaflearn2
       USERNAME: example
       PASSWORD: serverless
@@ -61,13 +60,17 @@ jobs:
         run: |
           sls deploy --config serverless.s3.yml --verbose
 
+      - name: Set frontend url
+        run: |
+          echo "PUBLIC_URL=https://${{ env.FRONTEND_S3_BUCKET }}.s3.eu-west-2.amazonaws.com" >> $GITHUB_ENV
+
       - name: Build frontend
         run: |
           make ci-build-front
 
       - name: Upload S3
         run: |
-          aws s3 sync apps/frontend/public/ s3://${{ env.FRONTEND_S3_BUCKET }}/ --delete
+          aws s3 sync apps/frontend/build/ s3://${{ env.FRONTEND_S3_BUCKET }}/ --delete
 
       - name: Build Backend Infrastructure
         run: |
@@ -112,7 +115,10 @@ jobs:
         uses: thollander/actions-comment-pull-request@v1
         with:
           message: |
-            Build created with output:
+            Build created with endpoints: 
+            API:
             ${{ env.FOO }} 
+            Frontend: 
+            ${{ env.PUBLIC_URL }}
             pgEndpoint: 
             ${{ steps.get-db-output.outputs.DBENDPOINT }}

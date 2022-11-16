@@ -6,7 +6,11 @@ ci-build-back:
 	composer install; \
 	php bin/console cache:warmup;
 
+.PHONY: build-front
+build-front:
+	cd apps/frontend; \
+	npm install; \
+	npm run build;
+
 .PHONY: ci-build-front
-ci-build-back:
-	cd ${FRONTEND_DIR}; \
-	npm install;
+ci-build-front: build-front
